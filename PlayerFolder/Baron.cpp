@@ -4,6 +4,11 @@ namespace coup{
         // nothing to do here
     }
 
+    Baron::~Baron() {
+        // nothing to do here
+        std::cout<< "Baron " << this->name << " destroyed" << std::endl;
+    }
+
     void Baron::invest(){
         int priceOfInvestment = 3; // the price of the invest action
 

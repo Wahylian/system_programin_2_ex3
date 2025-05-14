@@ -1,27 +1,64 @@
 #pragma once
-using namespace std;
-#include "Game.hpp"
-
 #include "../CustomExceptions.hpp"
 #include <iostream>
 #include <vector>
 using namespace std;
+
 namespace coup{
+    // an abstract class that represents a player in the game
     class Player{
+        friend class Player; // allows other players to access the protected methods of this instance of player
+        // since all subclasses of player are players too they need access to the protected methods of this instance
+        friend class Spy; 
+        friend class Merchant; 
+        friend class Judge; 
+        friend class Governor;
+        friend class General;
+        friend class Baron;
+        friend class Game; // allows the game to access the protected methods of player
         protected:
-            const int BLOCKABLE_ACTIONS = 4; // there are 4 actions that can be outright blocked: coup, tax, gather and arrest
-            // their order in the array is as mentioned above
+            int np;
             string name; // the name of the player
             string role; // the role of the player
             int coin; // the number of coins the player has
-            string lastArrested; // the name of the last player arrested by this player
-            unsigned int actionsLeft; // the number of actions left for the player to perform in a turn
-            vector<bool> blockedFrom; // blocked from using action
-
+            unsigned int remainingActions; // the number of actions left for the player to perform this turn
+            const Player *lastArrested; // the last player arrested by this player, this player cannot change it
+            const int BLOCKABLE_ACTIONS = 4; // there are 4 actions that can be outright blocked
+            vector<char> blockedActions; // these are the actions coup, tax, gather and arrest 
+            // block coup is a special case since it is blocking the action from occuring on this player
+            // not the action itself
+        
         public:
-            // constructor
-            Player(const string &name, string role);
+            // constructor 
+            Player(const string &name, const string &role);
 
+            // copy constructor
+            Player(const Player &other);
+
+            // destructor
+            virtual ~Player();
+
+            #pragma region Getters
+            // gets the name of this player
+            string getName() const;
+
+            // gets the role of this player
+            string getRole() const;
+
+            // gets the number of coins this player has
+            int coins() const;
+
+            // gets the number of actions left for this player to perform in this turn
+            unsigned int getRemainingActions() const;
+
+            // gets the last player arrested by this player
+            const Player& getLastArrested() const;
+            #pragma endregion
+
+            // returns true if this player is out of actions, else false
+            bool isOutOfActions() const; 
+
+            #pragma region Actions
             // the player receives 1 coin from the bank, this action costs nothing and can be blocked via the "sanction" action
             void gather();
 
@@ -42,79 +79,61 @@ namespace coup{
             // the player chooses another player and eliminates them from the game completely.
             // this action costs 7 coins and can be blocked under specific conditions.
             // throws nothing on success, on failure will throw an excpetion
-            void coup(Player &other);
+            void coup(const Player &other);
 
             // the player chooses to end their turn
             // this action removes all actions they may have left as well as lifts any blocks on them
             void endTurn();
+            #pragma endregion
 
-            // gets the name of the player
-            string getName() const;
+            // sets up the player to be able to perform an action
+            virtual void prepareForTurn();
 
-            // gets the number of coins the player has
-            int coins() const;
+            #pragma region blockCheckers
+            // a check if coup is blocked
+            bool isCoupBlocked() const;
 
-            // gets the role of the player
-            string getRole() const;
+            // a check if the tax action is blocked 
+            bool isTaxBlocked() const;
 
-            // prints the player
+            // a check if the gather action is blocked
+            bool isGatherBlocked() const;
+
+            // a check if the arrest action is blocked
+            bool isArrestBlocked() const;
+            #pragma endregion
+
+            // override the assignment operator
+            Player& operator=(const Player &other);
+
+            // allows the player to be printed
             friend ostream& operator<<(ostream &out, const Player &player);
-            
+
+        protected:
+            // function used to turn this class into an abstract class
+            virtual void virtualFunction() = 0;
+
             // adds coins to the player
             void addCoins(int amount);
 
-            // removes coins from the player (if amount is bigger than the number of coins the player has, sets coin count to 0)
-            void removeCoins(int amount);   
+            // remove coins from the player (cannot remove more coins than the player has)
+            void removeCoins(int amount);
 
-            // sets the coup action as blocked
+            // clears the last arrested player
+            friend void clearLastArrested(Player &player);
+
+            #pragma region block Actions
+            // blocks the coup action from occuring on this player
             void blockCoup();
 
-            // sets the tax action as blocked
+            // blocks this player from using the tax action
             void blockTax();
             
-            // sets the gather action as blocked
+            // blocks this player from using the gather action
             void blockGather();
-            
-            // sets the arrest action as blocked
+
+            // blocks this player from using the arrest action
             void blockArrest();
-
-        private:
-            // function used to turn this class into a virtual class
-            virtual void virtualFunction() = 0;
-
-        protected:
-
-            // check if the player is out of actions
-            bool isOutOfActions() const; 
-
-            // check if the player provided is the last player arrested by this player
-            bool isLastArrested(const string &otherName) const;
-
-            // check if the player is blocked from using the coup action
-            bool isCoupBlocked() const;
-
-            // check if the player is blocked from using the tax action
-            bool isTaxBlocked() const;
-
-            // check if the player is blocked from using the gather action
-            bool isGatherBlocked() const;
-
-            // check if the player is blocked from using the arrest action
-            bool isArrestBlocked() const;
-
-            // sets the coup action as unblocked
-            void unblockCoup();
-
-            // sets the tax action as unblocked
-            void unblockTax();
-
-            // sets the gather action as unblocked
-            void unblockGather();
-
-            // sets the arrest action as unblocked
-            void unblockArrest();
-
-            // removes amount from the actions left for this player
-            void removeActions(int amount);
+            #pragma endregion
     };
 }

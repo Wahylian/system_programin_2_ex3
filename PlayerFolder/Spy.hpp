@@ -6,11 +6,18 @@ namespace coup{
             // constructor
             Spy(const string &name);
 
-            // the spy can see the amount of coins of another player and stop them from using the "arrest" action on their next turn.
-            // this action costs nothing and doesn't take a turn
-            // will not throw an exception on success
-            void spyOn(Player &other);
+            // destructor
+            ~Spy();
 
+            // the spy can see the amount of coins of another player
+            // this action costs nothing and doesn't take a turn
+            int spyOn(Player &other);
+
+            // the spy can block the arrest action of another player
+            // this action costs nothing and doesn't take a turn
+            void blockOtherArrest(Player &other);
+
+        protected:
             // to avoid the class being abstract
             void virtualFunction() {
                 // nothing to do here

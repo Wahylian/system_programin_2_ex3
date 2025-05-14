@@ -1,9 +1,9 @@
 #pragma once
-using namespace std;
 #include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+using namespace std;
 namespace coup{
     class Game{
         public:

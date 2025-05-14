@@ -30,7 +30,7 @@ valgrind: Main
 	valgrind $(VALGRIND_FLAGS) ./Main
 
 # creates a test executable for the test files
-test: $(TEST_OBJ)
+test: $(TEST_OBJ) $(GAME_OBJ)
 	$(CXX) $(CXXFLAGS) -o test $(TEST_OBJ) $(GAME_OBJ)
 
 # checks for memory leaks during the tests

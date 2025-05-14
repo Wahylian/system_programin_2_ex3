@@ -6,9 +6,13 @@ namespace coup{
             // constructor
             Judge(const string &name);
 
+            // destructor
+            ~Judge();
+
             // the judge can undo the bribe action of another player
             void undoBribe(Player &other);
-            
+        
+        protected:    
             // to avoid the class being abstract
             void virtualFunction() {
                 // nothing to do here

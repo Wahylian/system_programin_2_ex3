@@ -4,12 +4,26 @@ namespace coup{
         // nothing to do here
     }
 
-    void Spy::spyOn(Player &other){
+    Spy::~Spy() {
+        // nothing to do here
+        std::cout<< "Spy " << this->name << " destroyed" << std::endl;
+    }
+
+    int Spy::spyOn(Player &other){
         // if the player is this player, throw an excpetion
         if(this == &other)
             throw illegal_action_on_self_exception("Spy On");
         
-        // blocks the other player from using the arrest action
+        // returns the number of coins the other player has
+        return other.coins();
+    }
+
+    void Spy::blockOtherArrest(Player &other){
+        // check if the other player is this player
+        if(this == &other)
+            throw illegal_action_on_self_exception("block the arrest action");
+        
+        // block the other player from using the arrest action
         other.blockArrest();
     }
 }
