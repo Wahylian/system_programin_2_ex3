@@ -6,14 +6,14 @@ namespace coup{
 
     Baron::~Baron() {
         // nothing to do here
-        std::cout<< "Baron " << this->name << " destroyed" << std::endl;
+        std::cout<< "Baron " << this->_name << " destroyed" << std::endl;
     }
 
     void Baron::invest(){
         int priceOfInvestment = 3; // the price of the invest action
 
         // checks if the player has enough coins
-        if(this->coin < priceOfInvestment)
+        if(this->_coins < priceOfInvestment)
             throw not_enough_coins_exception("invest", priceOfInvestment);
 
         // perform the invest action

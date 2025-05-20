@@ -6,7 +6,7 @@ namespace coup{
 
     General::~General() {
         // nothing to do here
-        std::cout<< "General " << this->name << " destroyed" << std::endl;
+        std::cout<< "General " << this->_name << " destroyed" << std::endl;
     }
 
     void General::blockCoupAttempt(Player &other){

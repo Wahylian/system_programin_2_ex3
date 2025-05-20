@@ -638,5 +638,198 @@ TEST_CASE("Test Base Player Functionality"){
         }
     }
 }
-   
 
+TEST_CASE("Test Player Copy Constructor"){
+    TestPlayer p1 = TestPlayer("John");
+    
+    // give p1 an action and some coins
+    p1.prepareForTurn(); 
+    p1.addCoins(5);
+
+    TestPlayer p2 = TestPlayer(p1); // copy constructor
+
+    // check that the players are the same
+    CHECK(p1.getName() == p2.getName());
+    CHECK(p1.getRole() == p2.getRole());
+    CHECK(p1.coins() == p2.coins());
+    CHECK(p1.getRemainingActions() == p2.getRemainingActions());
+
+    // check that the players are not the same object
+    CHECK(&p1 != &p2); // check that they are not the same object
+}
+
+TEST_CASE("Test Player Assignment Operator"){
+    SUBCASE("Assignment to self"){
+        TestPlayer p1 = TestPlayer("John");
+        
+        // give p1 an action and some coins
+        p1.prepareForTurn(); 
+        p1.addCoins(5);
+
+        // save the original address of p1
+        void *originalAddress = &p1;
+
+        // pragmas to allow for self assignment
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wself-assign-overloaded"
+        p1 = p1; // Self-assignment
+        #pragma clang diagnostic pop
+
+        // check that the players are the same
+        CHECK(p1.getName() == "John");
+        CHECK(p1.getRole() == "testPlayer");
+        CHECK(p1.coins() == 5);
+        CHECK(p1.getRemainingActions() == 1);
+
+        // check that the players are the same object
+        CHECK(originalAddress == &p1);
+    }
+
+    SUBCASE("Assignment to different player"){
+        TestPlayer p1 = TestPlayer("John");
+    
+        // give p1 an action and some coins
+        p1.prepareForTurn(); 
+        p1.addCoins(5);
+
+        TestPlayer p2 = TestPlayer("Doe"); // create a new player
+
+        // check that the players are not the same
+        CHECK(p1.getName() != p2.getName());
+        CHECK(p1.getRole() == p2.getRole()); // since they are both test players
+        CHECK(p1.coins() != p2.coins());
+        CHECK(p1.getRemainingActions() != p2.getRemainingActions());
+
+        // assign p1 to p2
+        p2 = p1;
+
+        // check that the players are the same
+        CHECK(p1.getName() == p2.getName());
+        CHECK(p1.getRole() == p2.getRole());
+        CHECK(p1.coins() == p2.coins());
+        CHECK(p1.getRemainingActions() == p2.getRemainingActions());
+
+        // check that the players are not the same object
+        CHECK(&p1 != &p2);
+    }
+}
+
+TEST_CASE("Test Player Valgrind"){
+    // test that the player is not causing any memory leaks
+    SUBCASE("TestPlayer"){
+        // create a player
+        TestPlayer *p = new TestPlayer("John");
+
+        // check that the player is not null
+        CHECK(p != nullptr);
+
+        // delete the player
+        delete p;
+    }
+
+    SUBCASE("TestPlayer Copy Constructor"){
+        // create a player
+        TestPlayer *p1 = new TestPlayer("John");
+
+        // check that the player is not null
+        CHECK(p1 != nullptr);
+
+        // create a copy of the player
+        TestPlayer *p2 = new TestPlayer(*p1);
+
+        // check that the copy is not null
+        CHECK(p2 != nullptr);
+
+        // delete the players
+        delete p1;
+        delete p2;
+    }
+
+    SUBCASE("TestPlayer Assignment Operator"){
+        // create a player
+        TestPlayer *p1 = new TestPlayer("John");
+
+        // check that the player is not null
+        CHECK(p1 != nullptr);
+
+        // create a copy of the player
+        TestPlayer *p2 = new TestPlayer("Doe");
+
+        // check that the copy is not null
+        CHECK(p2 != nullptr);
+
+        // assign p1 to p2
+        *p2 = *p1;
+
+        // check that the players are the same
+        CHECK(p1->getName() == p2->getName());
+        CHECK(p1->getRole() == p2->getRole());
+        CHECK(p1->coins() == p2->coins());
+        CHECK(p1->getRemainingActions() == p2->getRemainingActions());
+
+        // delete the players
+        delete p1;
+        delete p2;
+    }
+
+    SUBCASE("Testing other Player Types"){
+        SUBCASE("Test Spy"){
+            // create a spy
+            Spy *p = new Spy("John");
+
+            // check that the player is not null
+            CHECK(p != nullptr);
+
+            // delete the player
+            delete p;
+        }
+        SUBCASE("Test Merchant"){
+            // create a merchant
+            Merchant *p = new Merchant("John");
+
+            // check that the player is not null
+            CHECK(p != nullptr);
+
+            // delete the player
+            delete p;
+        }
+        SUBCASE("Test Judge"){
+            // create a judge
+            Judge *p = new Judge("John");
+
+            // check that the player is not null
+            CHECK(p != nullptr);
+
+            // delete the player
+            delete p;
+        }
+        SUBCASE("Test Governor"){
+            // create a governor
+            Governor *p = new Governor("John");
+
+            // check that the player is not null
+            CHECK(p != nullptr);
+
+            // delete the player
+            delete p;
+        }
+        SUBCASE("Test General"){
+            // create a general
+            General *p = new General("John");
+
+            // check that the player is not null
+            CHECK(p != nullptr);
+
+            // delete the player
+            delete p;
+        }
+        SUBCASE("Test Baron"){
+            // create a baron
+            Baron *p = new Baron("John");
+            // check that the player is not null
+            CHECK(p != nullptr);    
+            // delete the player
+            delete p;
+        }
+    }
+}
