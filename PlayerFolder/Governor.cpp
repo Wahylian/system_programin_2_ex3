@@ -6,15 +6,14 @@ namespace coup{
 
     Governor::~Governor() {
         // nothing to do here
-        std::cout<< "Governor " << this->name << " destroyed" << std::endl;
     }
 
     void Governor::tax(){
         int taxAmount = 3; // the amount of coins the governor can tax
 
         // check if the player has enough actions left
-        if(this->remainingActions == 0)
-            throw out_of_actions_exception(this->name);
+        if(this->_remainingActions == 0)
+            throw out_of_actions_exception(this->_name);
 
         // check if the tax action is blocked
         if(this->isTaxBlocked())
@@ -22,10 +21,10 @@ namespace coup{
 
         this->addCoins(taxAmount); // increase the coin count by 3
 
-        this->remainingActions--; // decrease the actions left by 1
+        this->_remainingActions--; // decrease the actions left by 1
     }
 
-    void Governor::undoTax(Player &other){
+    void Governor::undoTax(Player &other) const{
         // checks if other is this player
         if(this == &other)
             throw illegal_action_on_self_exception("Undo Tax");

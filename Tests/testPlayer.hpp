@@ -1,6 +1,12 @@
 #pragma once
 #include "doctest.h"
 #include "../PlayerFolder/Player.hpp"
+#include "../PlayerFolder/Spy.hpp"
+#include "../PlayerFolder/Merchant.hpp"
+#include "../PlayerFolder/Judge.hpp"
+#include "../PlayerFolder/Governor.hpp"
+#include "../PlayerFolder/General.hpp"
+#include "../PlayerFolder/Baron.hpp"
 
 using namespace coup;
 
@@ -23,7 +29,7 @@ class TestPlayer : public Player {
 
         ~TestPlayer() {
             // nothing to do here
-            std::cout<< "Test Player " << this->name << " destroyed" << std::endl;
+            std::cout<< "Test Player " << this->_name << " destroyed" << std::endl;
         }      
     protected:
         // to avoid the class being abstract

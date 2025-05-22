@@ -1,5 +1,5 @@
 #pragma once
-#include "../CustomExceptions.hpp"
+#include "../CustomExceptions/CustomPlayerExceptions.hpp"
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -17,14 +17,13 @@ namespace coup{
         friend class Baron;
         friend class Game; // allows the game to access the protected methods of player
         protected:
-            int np;
-            string name; // the name of the player
-            string role; // the role of the player
-            int coin; // the number of coins the player has
-            unsigned int remainingActions; // the number of actions left for the player to perform this turn
-            const Player *lastArrested; // the last player arrested by this player, this player cannot change it
+            string _name; // the name of the player
+            string _role; // the role of the player
+            int _coins; // the number of coins the player has
+            unsigned int _remainingActions; // the number of actions left for the player to perform this turn
+            const Player *_lastArrested; // the last player arrested by this player, this player cannot change it
             const int BLOCKABLE_ACTIONS = 4; // there are 4 actions that can be outright blocked
-            vector<char> blockedActions; // these are the actions coup, tax, gather and arrest 
+            vector<char> _blockedActions; // these are the actions coup, tax, gather and arrest 
             // block coup is a special case since it is blocking the action from occuring on this player
             // not the action itself
         
@@ -53,6 +52,10 @@ namespace coup{
 
             // gets the last player arrested by this player
             const Player& getLastArrested() const;
+
+            // returns a vector of strings with the actions this player can perform
+            // NOTE: includes all possible actions whether they are situational or not
+            vector<string> getValidActions() const;
             #pragma endregion
 
             // returns true if this player is out of actions, else false
@@ -108,6 +111,13 @@ namespace coup{
 
             // allows the player to be printed
             friend ostream& operator<<(ostream &out, const Player &player);
+
+            // returns true if the provided action is a possible action for this player
+            // NOTE: the undo actions are not included in this check
+            bool isValidAction(const string &action) const;
+
+            // returns true if the provided action is a possible action for this player
+            bool isValidUndoAction(const string &undoAction) const;
 
         protected:
             // function used to turn this class into an abstract class
