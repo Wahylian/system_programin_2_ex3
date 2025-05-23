@@ -17,7 +17,7 @@ namespace coup{
             static std::mt19937 gen(rd());
             static std::uniform_int_distribution<> dist(0, 5);
             int randomRole = dist(gen);
-            
+       
             switch(randomRole){
                 case 0:
                     newPlayer = new Spy(playerName);
@@ -48,6 +48,7 @@ namespace coup{
 
         // start the first players turn
         this->_currentPlayer->prepareForTurn();
+
     }
 
     Game::~Game(){
@@ -100,6 +101,7 @@ namespace coup{
     }
 
     int Game::playAction(const string &action, Player *target){
+
         // get the current players turn
         Player *currentPlayer = (this->_players)[currentPlayerIndex()];
         // check if the action is valid for the current player
@@ -112,6 +114,7 @@ namespace coup{
             currentPlayer->endTurn();
             // advance the game to the next player
             this->nextTurn();
+          
             // if the action was to end the turn, return true (-1)
             return -1;
         }
@@ -147,6 +150,7 @@ namespace coup{
 
             // try to coup the target player
             currentPlayer->coup(*target);
+
             // if the coup was successful (meaning no exceptions were thrown)
             // remove the target player from the game
             this->removePlayer(*target);
@@ -166,6 +170,7 @@ namespace coup{
         if(action == "spyOn"){
             Spy *spy = (Spy *)currentPlayer;
             return spy->spyOn(*target);
+
         }
         if(action == "blockArrest"){
             Spy *spy = (Spy *)currentPlayer;

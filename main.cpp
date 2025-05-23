@@ -1,6 +1,7 @@
 #include "main.hpp"
 
 
+
 void printPlayers(const vector<string> &players){
     for(int i = 0; i < players.size(); i++){
         string playerName = players[i];
@@ -24,6 +25,7 @@ int main(){
 
     // print the names of all the players
     cout << "Players in the game: \n";
+
     printPlayers(game.players());
 
 
@@ -74,14 +76,14 @@ int main(){
                     }
                     // sets the target player
                     targetPlayer = game.getPlayerByIndex(targetPlayerIndex);
-                }
-                
+                }              
 
                 // attempt to perform the action
                 try{
                     // if the turn is over, break the loop
                     int res = game.playAction(action, targetPlayer); // saves the result of the action
                     if(res == -1){
+
                         break;
                     }
 
@@ -98,6 +100,7 @@ int main(){
                             if(ans == "y"){
                                 // undo the bribe
                                 game.undoAction(*judge, "undoBribe");
+
                                 cout << "Bribe undone for " << currentPlayerName << endl;
                                 // breaks the loop
                                 break;
@@ -116,6 +119,7 @@ int main(){
                             if(ans == "y"){
                                 // undos the taxation
                                 game.undoAction(*governor ,"undoTax");
+
                                 cout << "Tax blocked for " << currentPlayerName << endl;
                                 // breaks the loop
                                 break;
@@ -126,6 +130,7 @@ int main(){
                         // in the case of the spyOn action, res will hold the number of coins the target player has
                         cout << targetPlayer->getName() << " has " << res << " coins" << endl;
                     }
+
                 }
                 // the action can fail for multiple reasons
                 catch(invalid_action_exception &e){
@@ -150,6 +155,7 @@ int main(){
                     cout << e.what() << endl;
                 }
             }
+          
             // clear the console
             system("clear");
         }

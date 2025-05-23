@@ -52,6 +52,7 @@ namespace coup{
             // (since the number of coins is non-negative, it is distinguishable from -1 and -2)
             int playAction(const string &action, Player *target = nullptr);
 
+
             // lets a player undo an action of the current player
             // note: not all actions are undoable and not all players can undo actions
             void undoAction(const Player& player, const string &undoAction);
@@ -83,6 +84,7 @@ namespace coup{
             // returns true if the action provided requires a target player, else false
             // will throw an exception if the action is not valid
             bool isTargetRequired(const string &action) const;
+
         private:
             // gets the index of the current player
             int currentPlayerIndex() const;

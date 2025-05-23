@@ -46,6 +46,7 @@ namespace coup{
     bool Player::isOutOfActions() const {
         // check if the player has any more actions left
         return this->_remainingActions == 0; 
+
     }
 
     vector<string> Player::getValidActions() const{
