@@ -1,11 +1,5 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdexcept>
+#include "main.hpp"
 
-#include "Game.hpp"
-using namespace std;
-using namespace coup;
 
 
 void printPlayers(const vector<string> &players){
@@ -15,11 +9,23 @@ void printPlayers(const vector<string> &players){
     }
 }
 
+void printPlayerInfo(const vector<string> &info){
+    cout << "Name: " << info[0] << endl;
+    cout << "Role: " << info[1] << endl;
+    cout << "Coins: " << info[2] << endl;
+    cout << "Actions left: " << info[3] << endl;
+}
+
 int main(){
+    system("clear"); // cleans the console from the command lines
     // create a game with 6 players
-    Game game = Game({"Alice", "Bob", "Charlie", "Dave", "Eve", "Frank"});
+    //Game game = Game({"Alice", "Bob", "Charlie", "Dave", "Eve", "Frank"});
+    // create a game with 2 players
+    Game game = Game({"Alice", "Bob"});
+
     // print the names of all the players
-    cout << "Players in the game: ";
+    cout << "Players in the game: \n";
+
     printPlayers(game.players());
 
 
@@ -37,29 +43,47 @@ int main(){
             string currentPlayerName = game.turn();
 
             // prints the current player
-            cout << "Current player: " << currentPlayerName << endl;
+            cout << "Current player: " << currentPlayerName <<  endl;
             
             while(true){
+                // prints the current player's info
+                printPlayerInfo(game.info());
+
+                // prints the actions available to the current player
+                game.printValidActions();
+
                 // gets the action the player wants to perform
                 string action;
                 cout << "Enter action: ";
                 cin >> action;
 
-                // gets the target player for the action
-                int targetPlayerIndex;
-                cout << "Enter target player: ";
-                printPlayers(game.players());
-                cin >> targetPlayerIndex;
-                while(targetPlayerIndex < 0 || targetPlayerIndex >= game.playersCount()){
-                    cout << "Invalid player index" << endl;
-                    cin >> targetPlayerIndex;
+                // check the action is valid
+                while(!game.isValidAction(action)){
+                    cout << "Invalid action, please enter a valid action:" << endl;
+                    cin >> action;
                 }
-                Player *targetPlayer = game.getPlayerByIndex(targetPlayerIndex);
+                Player *targetPlayer = nullptr;
+                // check if the action requires a target player
+                if(game.isTargetRequired(action)){
+                    // gets the target player for the action
+                    int targetPlayerIndex;
+                    cout << "Enter target player: ";
+                    printPlayers(game.players());
+                    cin >> targetPlayerIndex;
+                    while(targetPlayerIndex < 0 || targetPlayerIndex >= game.playersCount()){
+                        cout << "Invalid player index" << endl;
+                        cin >> targetPlayerIndex;
+                    }
+                    // sets the target player
+                    targetPlayer = game.getPlayerByIndex(targetPlayerIndex);
+                }              
 
                 // attempt to perform the action
                 try{
                     // if the turn is over, break the loop
-                    if(game.playAction(action, *targetPlayer)){
+                    int res = game.playAction(action, targetPlayer); // saves the result of the action
+                    if(res == -1){
+
                         break;
                     }
 
@@ -75,7 +99,8 @@ int main(){
                             cin >> ans;
                             if(ans == "y"){
                                 // undo the bribe
-                                game.undoAction("Bribe");
+                                game.undoAction(*judge, "undoBribe");
+
                                 cout << "Bribe undone for " << currentPlayerName << endl;
                                 // breaks the loop
                                 break;
@@ -93,13 +118,19 @@ int main(){
                             cin >> ans;
                             if(ans == "y"){
                                 // undos the taxation
-                                game.undoAction("Tax");
+                                game.undoAction(*governor ,"undoTax");
+
                                 cout << "Tax blocked for " << currentPlayerName << endl;
                                 // breaks the loop
                                 break;
                             }
                         }
                     }
+                    if(action == "spyOn"){
+                        // in the case of the spyOn action, res will hold the number of coins the target player has
+                        cout << targetPlayer->getName() << " has " << res << " coins" << endl;
+                    }
+
                 }
                 // the action can fail for multiple reasons
                 catch(invalid_action_exception &e){
@@ -124,6 +155,9 @@ int main(){
                     cout << e.what() << endl;
                 }
             }
+          
+            // clear the console
+            system("clear");
         }
     }
 

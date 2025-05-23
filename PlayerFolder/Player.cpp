@@ -14,8 +14,6 @@ namespace coup{
     }
 
     Player::~Player() {
-        std::cout<< "Player " << this->_name << " destroyed" << std::endl;
-
         // sets lastArrested to null to avoid a pointer to a deleted object
         this->_lastArrested = nullptr; 
     }
@@ -48,6 +46,35 @@ namespace coup{
     bool Player::isOutOfActions() const {
         // check if the player has any more actions left
         return this->_remainingActions == 0; 
+
+    }
+
+    vector<string> Player::getValidActions() const{
+        // creates the vector with the actions available to all players
+        vector<string> isValidActions{"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn"}; 
+        // check the player's role
+        if(this->getRole() == "Baron"){
+            // adds the invest action to the vector
+            isValidActions.push_back("invest");
+        }
+        else if(this->getRole() == "General"){
+            // adds the blockCoup action to the vector
+            isValidActions.push_back("blockCoup");
+        }
+        else if(this->getRole() == "Spy"){
+            // adds the spyOn and blockArrest actions to the vector
+            isValidActions.push_back("spyOn");
+            isValidActions.push_back("blockArrest");
+        }
+        else if(this->getRole() == "Judge"){
+            // adds the undoBribe action to the vector
+            isValidActions.push_back("undoBribe");
+        }
+        else if(this->getRole() == "Governor"){
+            // adds the undoTax action to the vector
+            isValidActions.push_back("undoTax");
+        }
+        return isValidActions;
     }
 
     void Player::gather(){

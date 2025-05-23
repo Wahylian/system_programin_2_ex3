@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <random>
 using namespace std;
 namespace coup{
     class Game{
@@ -28,16 +29,29 @@ namespace coup{
             // Constructor
             Game(const vector<string> &players);
 
+            // Destructor
+            ~Game();
+
             // getting the players of the game
             vector<string> players() const;
 
             // getting the name of the current player
             string turn() const;
 
+            // getting the role of the current player
+            string role() const;
+            // getting the name of the player, their role, the number of coins they have and
+            // the number of actions they have left
+            // NOTE: the order is as follows: 0: name, 1: role, 2: coins, 3: actions
+            vector<string> info() const;
+
             // lets the current player do an action
             // note: not all actions are available to all players and not all actions require a target player
-            // return true if the action was to end the turn, else false
-            bool playAction(const string &action, Player *target = nullptr);
+            // return -1 if the action was to end the turn, return -2 if the action was not to end the turn
+            // if the action was to spyOn another player, return the number of coins the other player has
+            // (since the number of coins is non-negative, it is distinguishable from -1 and -2)
+            int playAction(const string &action, Player *target = nullptr);
+
 
             // lets a player undo an action of the current player
             // note: not all actions are undoable and not all players can undo actions
@@ -45,6 +59,13 @@ namespace coup{
 
             // advances the game to the next player
             void nextTurn();
+
+            // returns true if the action provided is a valid action for the current player, else false
+            // NOTE: in the event the current player has at least 10 coins, they must coup another player
+            bool isValidAction(const string &action) const;
+
+            // prints the actions available to the current player
+            void printValidActions() const;
 
             // returns all players in the game with the provided role, 
             // except for the current player
@@ -58,7 +79,11 @@ namespace coup{
 
             // returns a pointer to the player at the provided index
             // if the index is out of bounds, it will throw an exception
-            Player *getPlayerByIndex(int index) const;
+            Player *getPlayerByIndex(int index) const;  
+
+            // returns true if the action provided requires a target player, else false
+            // will throw an exception if the action is not valid
+            bool isTargetRequired(const string &action) const;
 
         private:
             // gets the index of the current player

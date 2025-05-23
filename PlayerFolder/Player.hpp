@@ -52,6 +52,10 @@ namespace coup{
 
             // gets the last player arrested by this player
             const Player& getLastArrested() const;
+
+            // returns a vector of strings with the actions this player can perform
+            // NOTE: includes all possible actions whether they are situational or not
+            vector<string> getValidActions() const;
             #pragma endregion
 
             // returns true if this player is out of actions, else false

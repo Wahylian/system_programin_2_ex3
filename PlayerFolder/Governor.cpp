@@ -6,7 +6,6 @@ namespace coup{
 
     Governor::~Governor() {
         // nothing to do here
-        std::cout<< "Governor " << this->_name << " destroyed" << std::endl;
     }
 
     void Governor::tax(){

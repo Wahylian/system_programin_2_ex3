@@ -6,14 +6,18 @@ namespace coup{
         // check if the number of players is valid
         if(players.size() < MIN_PLAYERS || players.size() > MAX_PLAYERS)
             throw invalid_number_of_players_exception(players.size());
-        
+
         // sets the players for the game
         for(const string &playerName : players){
             // create a new player pointer for the current player
             Player *newPlayer = nullptr;
 
             // roll a random role for this player
-            int randomRole = rand() % 6;
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            static std::uniform_int_distribution<> dist(0, 5);
+            int randomRole = dist(gen);
+       
             switch(randomRole){
                 case 0:
                     newPlayer = new Spy(playerName);
@@ -41,7 +45,10 @@ namespace coup{
 
         // sets the current player to the first player
         (this->_currentPlayer) = _players[0];
-        
+
+        // start the first players turn
+        this->_currentPlayer->prepareForTurn();
+
     }
 
     Game::~Game(){
@@ -72,7 +79,29 @@ namespace coup{
         return (this->_currentPlayer)->getName();
     }
 
-    bool Game::playAction(const string &action, Player *target = nullptr){
+    string Game::role() const {
+        // returns the role of the current player
+        return (this->_currentPlayer)->getRole();
+    }
+
+    vector<string> Game::info() const {
+        // creates a vector of strings to hold the info of the current player
+        vector<string> playerInfo;
+        // adds the name of the player to the vector
+        playerInfo.push_back((this->_currentPlayer)->getName());
+        // adds the role of the player to the vector
+        playerInfo.push_back((this->_currentPlayer)->getRole());
+        // adds the number of coins the player has to the vector
+        playerInfo.push_back(to_string((this->_currentPlayer)->coins()));
+        // adds the number of actions left for this player to perform in this turn
+        playerInfo.push_back(to_string((this->_currentPlayer)->getRemainingActions()));
+        
+        // returns the vector of player info
+        return playerInfo;
+    }
+
+    int Game::playAction(const string &action, Player *target){
+
         // get the current players turn
         Player *currentPlayer = (this->_players)[currentPlayerIndex()];
         // check if the action is valid for the current player
@@ -85,7 +114,9 @@ namespace coup{
             currentPlayer->endTurn();
             // advance the game to the next player
             this->nextTurn();
-            return true;
+          
+            // if the action was to end the turn, return true (-1)
+            return -1;
         }
         
         // perform the appropriate action for the player
@@ -119,6 +150,10 @@ namespace coup{
 
             // try to coup the target player
             currentPlayer->coup(*target);
+
+            // if the coup was successful (meaning no exceptions were thrown)
+            // remove the target player from the game
+            this->removePlayer(*target);
         }
         
         // check if the player wants to do a specialized action
@@ -134,15 +169,16 @@ namespace coup{
         }
         if(action == "spyOn"){
             Spy *spy = (Spy *)currentPlayer;
-            spy->spyOn(*target);
+            return spy->spyOn(*target);
+
         }
         if(action == "blockArrest"){
             Spy *spy = (Spy *)currentPlayer;
             spy->blockOtherArrest(*target);
         }
 
-        // if the action was not to end the turn, return false
-        return false;
+        // if the action was not to end the turn, return false (-2)
+        return -2;
     }
 
     void Game::undoAction(const Player& player, const string &undoAction){
@@ -172,8 +208,27 @@ namespace coup{
         // sets the current player to the next player
         this->_currentPlayer = nextPlayer;
 
+        // prepare the next player for their turn
+        this->_currentPlayer->prepareForTurn();
+
         // returns
         return;
+    }
+
+    bool Game::isValidAction(const string &action) const{
+        // check if the player has at least 10 coins
+        if(this->_currentPlayer->coins() >= 10){
+            // check if the player has an action remaining
+            if(!this->_currentPlayer->isOutOfActions()){
+                if(action != "coup") // if they have an action remaining, they must coup another player
+                    return false;
+                else
+                    return true; 
+            }
+        }
+
+        // check if the action is valid for the current player
+        return this->_currentPlayer->isValidAction(action);
     }
 
     vector<Player *> Game::allOfRole(const string &role) const{
@@ -217,6 +272,35 @@ namespace coup{
 
         // return the player at the specified index
         return (this->_players)[index];
+    }
+
+    bool Game::isTargetRequired(const string &action) const{
+        // check if the action is valid for the current player
+        if(!this->isValidAction(action))
+            throw invalid_action_exception(action, this->_currentPlayer->getName());
+
+        // check if it is a basic action that requires a target player
+        if(action == "arrest" || action == "sanction" || action == "coup")
+            return true; 
+
+        // check if it is a specialized action that requires a target player
+        if(action == "blockCoup" || action == "blockArrest" || action == "spyOn" || \
+           action == "undoBribe" || action == "undoTax")
+            return true;
+
+        // returns false if the action does not require a target player
+        return false;
+    }
+
+    void Game::printValidActions() const{
+        // prints the actions available to the current player
+        cout << "Available actions for " << this->_currentPlayer->getName() << ": " << endl;
+        // gets the valid actions for the current player
+        vector<string> validActions = this->_currentPlayer->getValidActions();
+        // prints the actions
+        for(const string &action : validActions){
+            cout << action << endl;
+        }
     }
 
     int Game::currentPlayerIndex() const{

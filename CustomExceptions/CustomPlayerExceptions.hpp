@@ -17,7 +17,7 @@ class out_of_actions_exception : public std::runtime_error{
 class blocked_action_exception : public std::runtime_error{
     public:
         explicit blocked_action_exception(const std::string &actionName) : 
-        std::runtime_error("the action " + actionName + "was blocked") 
+        std::runtime_error("the action " + actionName + " was blocked") 
         {
 
         }
@@ -47,6 +47,15 @@ class illegal_action_on_self_exception : public std::runtime_error{
     public:
         explicit illegal_action_on_self_exception(const std::string &actionName) :
         std::runtime_error("cannot perform " + actionName + " on self") 
+        {
+
+        }
+};
+
+class must_play_coup_exception : public std::runtime_error{
+    public:
+        explicit must_play_coup_exception(const std::string &playerName) :
+        std::runtime_error(playerName + " must attempt a coup on another player") 
         {
 
         }

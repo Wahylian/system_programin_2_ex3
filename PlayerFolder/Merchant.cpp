@@ -6,7 +6,6 @@ namespace coup{
 
     Merchant::~Merchant() {
         // nothing to do here
-        std::cout<< "Merchant " << this->_name << " destroyed" << std::endl;
     }
 
     void Merchant::prepareForTurn(){
