@@ -65,6 +65,7 @@ class undo_coup_exception : public std::runtime_error{
     public:
         explicit undo_coup_exception(const std::string &playerName) :
         std::runtime_error("the coup on " + playerName + " was undone") 
+
         {
 
         }

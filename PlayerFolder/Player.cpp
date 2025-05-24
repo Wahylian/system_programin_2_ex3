@@ -223,6 +223,7 @@ namespace coup{
         // after removing the coins and the action, check if the coup was undone
         if(undone)
             throw undo_coup_exception(other.getName());
+
     }
 
     void Player::endTurn(){

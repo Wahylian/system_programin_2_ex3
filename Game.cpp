@@ -2,7 +2,7 @@
 
 namespace coup{
     Game::Game(const vector<string> &players) :
-        _players{},_currentPlayer{nullptr} {
+        _players{}, _currentPlayer{nullptr} {
         // check if the number of players is valid
         if(players.size() < MIN_PLAYERS || players.size() > MAX_PLAYERS)
             throw invalid_number_of_players_exception(players.size());
@@ -112,6 +112,7 @@ namespace coup{
             currentPlayer->endTurn();
             // advance the game to the next player
             this->nextTurn();
+
             // if the action was to end the turn, return true (-1)
             return -1;
         }
@@ -147,6 +148,7 @@ namespace coup{
 
             // try to coup the target player
             currentPlayer->coup(*target, undone);
+
             // if the coup was successful (meaning no exceptions were thrown)
             // remove the target player from the game
             this->removePlayer(*target);

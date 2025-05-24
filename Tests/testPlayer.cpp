@@ -623,24 +623,22 @@ TEST_CASE("Test Base Player Functionality"){
 }
 
 TEST_CASE("Test Player Copy Constructor"){
-    SUBCASE("Copy Same Role"){
-        TestPlayer p1 = TestPlayer("John");
+    TestPlayer p1 = TestPlayer("John");
     
-        // give p1 an action and some coins
-        p1.prepareForTurn(); 
-        p1.addCoins(5);
+    // give p1 an action and some coins
+    p1.prepareForTurn(); 
+    p1.addCoins(5);
 
-        TestPlayer p2 = TestPlayer(p1); // copy constructor
+    TestPlayer p2 = TestPlayer(p1); // copy constructor
 
-        // check that the players are the same
-        CHECK(p1.getName() == p2.getName());
-        CHECK(p1.getRole() == p2.getRole());
-        CHECK(p1.coins() == p2.coins());
-        CHECK(p1.getRemainingActions() == p2.getRemainingActions());
+    // check that the players are the same
+    CHECK(p1.getName() == p2.getName());
+    CHECK(p1.getRole() == p2.getRole());
+    CHECK(p1.coins() == p2.coins());
+    CHECK(p1.getRemainingActions() == p2.getRemainingActions());
 
-        // check that the players are not the same object
-        CHECK(&p1 != &p2); // check that they are not the same object
-    }
+    // check that the players are not the same object
+    CHECK(&p1 != &p2); // check that they are not the same object
 }
 
 TEST_CASE("Test Player Assignment Operator"){
