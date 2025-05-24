@@ -24,7 +24,7 @@ namespace coup{
             const Player *_lastArrested; // the last player arrested by this player, this player cannot change it
             const int BLOCKABLE_ACTIONS = 3; // there are 3 actions that can be outright blocked
             vector<char> _blockedActions; // these are the actions tax, gather and arrest 
-        
+            string _lastAction; // the last action performed by this player, used for undo actions
         public:
             // constructor 
             Player(const string &name, const string &role);
@@ -52,12 +52,19 @@ namespace coup{
             const Player* getLastArrested() const;
 
             // returns a vector of strings with the actions this player can perform
-            // NOTE: this does not include the undo actions
             vector<string> getValidActions() const;
+
+            // returns a vector of strings with the undo actions this player can perform
+            vector<string> getValidUndoActions() const;
+
+            const string& getLastAction() const; 
             #pragma endregion
 
             // returns true if this player is out of actions, else false
             bool isOutOfActions() const; 
+
+            // returns true if the player can perform the coup action on the target, else false
+            bool canCoup(const Player &target) const;
 
             #pragma region Actions
             // the player receives 1 coin from the bank, this action costs nothing and can be blocked via the "sanction" action

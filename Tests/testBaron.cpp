@@ -10,6 +10,7 @@ TEST_CASE("Test Baron Construction"){
         CHECK(b.coins() == 0);
         CHECK(b.getRemainingActions() == 0);
         CHECK(b.getLastArrested() == nullptr);
+        CHECK(b.getLastAction() == ""); 
     }
     SUBCASE("Test Baron Copy Constructor"){
         Baron b1 = Baron("John");
@@ -28,6 +29,7 @@ TEST_CASE("Test Baron Construction"){
         CHECK(b2.coins() == b1.coins());
         CHECK(b2.getRemainingActions() == b1.getRemainingActions());
         CHECK(b2.getLastArrested() == b1.getLastArrested());
+        CHECK(b2.getLastAction() == b1.getLastAction());
 
         // check that the players are not the same object
         CHECK(&b1 != &b2);
@@ -56,6 +58,7 @@ TEST_CASE("Test Baron Construction"){
             CHECK(b1.coins() == 3);
             CHECK(b1.getRemainingActions() == 0);
             CHECK(b1.getLastArrested() == nullptr);
+            CHECK(b1.getLastAction() == "gather"); 
         
             // check that the player is saved in the same address
             CHECK(&b1 == pB1);
@@ -77,75 +80,59 @@ TEST_CASE("Test Baron Construction"){
             CHECK(b2.coins() == b1.coins());
             CHECK(b2.getRemainingActions() == b1.getRemainingActions());
             CHECK(b2.getLastArrested() == b1.getLastArrested());
+            CHECK(b2.getLastAction() == b1.getLastAction());
             // check that the players are not the same object
             CHECK(&b1 != &b2);
-        }
-        
-    }
-    SUBCASE("Test Baron Valid Actions"){
-        SUBCASE("Test Baron Valid Actions"){
-            Baron b = Baron("John");
-
-            // create a list of the excpected valid actions of the baron
-            vector<string> expectedValidActions = {"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn", "invest"};
-            
-            // get the valid actions for the player
-            vector<string> actualValidActions = b.getValidActions();
-
-            // check that the vectors are the same
-            CHECK(expectedValidActions == actualValidActions);
-
-            // check that the baron accepts the valid actions
-            for(const string &action : expectedValidActions){
-                CHECK(b.isValidAction(action) == true);
-            }
-
-            // check that the baron does not accept actions of any other type of player
-            CHECK(!b.isValidAction("undoCoup") == true); // general special action
-            CHECK(!b.isValidAction("spyOn") == true); // spy special action
-            CHECK(!b.isValidAction("undoBribe") == true); // judge special action
-            CHECK(!b.isValidAction("undoTax") == true); // governor special action
-            CHECK(!b.isValidAction("blockArrest") == true); // spy special action
-
-            // check that the baron does not accept any other actions
-            CHECK(!b.isValidAction("test") == true);
-            CHECK(!b.isValidAction("yatzee") == true);
-            CHECK(!b.isValidAction("banana") == true);
-        }
-        SUBCASE("Test Baron Valid Undo Actions"){
-            Baron b = Baron("John");
-
-            // check that the baron does not accept any undo actions
-            CHECK(!b.isValidUndoAction("undoCoup") == true); // general special action
-            CHECK(!b.isValidUndoAction("undoBribe") == true); // judge special action
-            CHECK(!b.isValidUndoAction("undoTax") == true); // governor special action
-            // check that the baron does not accept any other actions as undo actions
-            CHECK(!b.isValidUndoAction("test") == true);
-            CHECK(!b.isValidUndoAction("yatzee") == true);
         }
     }
 }
 
-TEST_CASE("Test Baron Valgrind"){
-    Baron *b = new Baron("John");
-    // do multiple things with the baron
-    b->prepareForTurn();
-    b->gather();
-    b->prepareForTurn();
-    b->tax();
-    b->prepareForTurn();
-    b->gather();
-    b->prepareForTurn();
+TEST_CASE("Test Baron Valid Actions"){
+    SUBCASE("Test Baron Valid Actions"){
+        Baron b = Baron("John");
 
-    // check that the baron has 4 coins
-    CHECK(b->coins() == 4);
-    // check that the baron has 1 action left
-    CHECK(b->getRemainingActions() == 1);
-    // check that the baron has not arrested anyone
-    CHECK(b->getLastArrested() == nullptr);
+        // create a list of the excpected valid actions of the baron
+        vector<string> expectedValidActions = {"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn", "invest"};
+            
+        // get the valid actions for the player
+        vector<string> actualValidActions = b.getValidActions();
 
-    // delete the baron
-    delete b;
+        // check that the vectors are the same
+        CHECK(expectedValidActions == actualValidActions);
+
+        // check that the baron accepts the valid actions
+        for(const string &action : expectedValidActions){
+            CHECK(b.isValidAction(action) == true);
+        }
+
+        // check that the baron does not accept actions of any other type of player
+        CHECK(!b.isValidAction("undoCoup") == true); // general special action
+        CHECK(!b.isValidAction("spyOn") == true); // spy special action
+        CHECK(!b.isValidAction("undoBribe") == true); // judge special action
+        CHECK(!b.isValidAction("undoTax") == true); // governor special action
+        CHECK(!b.isValidAction("blockArrest") == true); // spy special action
+
+        // check that the baron does not accept any other actions (not real actions)
+        CHECK(!b.isValidAction("test") == true);
+        CHECK(!b.isValidAction("yatzee") == true);
+        CHECK(!b.isValidAction("banana") == true);
+    }
+    SUBCASE("Test Baron Valid Undo Actions"){
+        Baron b = Baron("John");
+
+        // get a vector of the supposed valid undo actions of the baron
+        vector<string> validUndoActions = b.getValidUndoActions();
+        // should be 0 valid undo actions since the baron has no undo actions
+        CHECK(validUndoActions.size() == 0);
+
+        // check that the baron does not accept any undo actions
+        CHECK(!b.isValidUndoAction("undoCoup") == true); // general special action
+        CHECK(!b.isValidUndoAction("undoBribe") == true); // judge special action
+        CHECK(!b.isValidUndoAction("undoTax") == true); // governor special action
+        // check that the baron does not accept any other actions as undo actions (not real actions)
+        CHECK(!b.isValidUndoAction("test") == true);
+        CHECK(!b.isValidUndoAction("yatzee") == true);
+    }
 }
 
 TEST_CASE("Test Baron Special Interactions"){

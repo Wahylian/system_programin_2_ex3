@@ -1,5 +1,6 @@
 #include "main.hpp"
 
+
 void printPlayers(const vector<string> &players){
     for(int i = 0; i < players.size(); i++){
         string playerName = players[i];
@@ -23,8 +24,8 @@ int main(){
 
     // print the names of all the players
     cout << "Players in the game: \n";
-
     printPlayers(game.players());
+
 
     // starts to run game
     while(true){
@@ -75,6 +76,7 @@ int main(){
                     targetPlayer = game.getPlayerByIndex(targetPlayerIndex);
                 }
                 
+
                 // attempt to perform the action
                 try{
                     // since in reality the coup is handled by the game itself,
@@ -106,7 +108,6 @@ int main(){
                     // if the turn is over, break the loop
                     int res = game.playAction(action, targetPlayer, undoCoup); // saves the result of the action
                     if(res == -1){
-
                         break;
                     }
 
@@ -141,7 +142,6 @@ int main(){
                             if(ans == "y"){
                                 // undos the taxation
                                 game.undoAction(*governor ,"undoTax");
-
                                 cout << "Tax blocked for " << currentPlayerName << endl;
                                 // breaks the loop
                                 break;
@@ -180,11 +180,12 @@ int main(){
                     cout << e.what() << endl;
                 }
             }
-
             // clear the console
             system("clear");
         }
     }
+
+    
 
     return 0;
 }

@@ -65,7 +65,6 @@ class undo_coup_exception : public std::runtime_error{
     public:
         explicit undo_coup_exception(const std::string &playerName) :
         std::runtime_error("the coup on " + playerName + " was undone") 
-
         {
 
         }
@@ -75,6 +74,26 @@ class must_play_coup_exception : public std::runtime_error{
     public:
         explicit must_play_coup_exception(const std::string &playerName) :
         std::runtime_error(playerName + " must attempt a coup on another player") 
+        {
+
+        }
+};
+
+class undo_wrong_action_exception : public std::runtime_error{
+    public:
+        explicit undo_wrong_action_exception(const std::string &performer, const std::string &undoName,\
+             const std::string &actionName = "") :
+        std::runtime_error("last action performed by "+ performer +" was not " + undoName\
+             + " it was " + actionName) 
+        {
+
+        }
+};
+
+class undo_self_action_exception : public std::runtime_error{
+    public:
+        explicit undo_self_action_exception(const std::string &actionName) :
+        std::runtime_error("you cannot undo your own " + actionName + " action") 
         {
 
         }

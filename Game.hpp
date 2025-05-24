@@ -86,7 +86,6 @@ namespace coup{
 
             // returns true if the current player is allowed to perform a coup during their turn, else false
             bool isValidCoup(const Player *target) const; 
-      
         private:
             // gets the index of the current player
             int currentPlayerIndex() const;

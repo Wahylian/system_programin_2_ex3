@@ -13,7 +13,9 @@ CUST_EXCEPT_OBJ = CustomExceptions/CustomPlayerExceptions.o CustomExceptions/Cus
 GAME_OBJ = Game.o $(CUST_EXCEPT_OBJ) $(PLAYER_OBJ)
 
 # object files for the test files
-TEST_OBJ = Tests/testFile.o Tests/testPlayer.o Tests/testBaron.o Tests/testGeneral.o
+TEST_OBJ = Tests/testFile.o Tests/testPlayer.o Tests/testBaron.o Tests/testGeneral.o \
+			Tests/testGovernor.o Tests/testJudge.o Tests/testMerchant.o Tests/testSpy.o \
+			Tests/testGame.o
 
 # object files for the main function
 MAIN_OBJ = main.o $(GAME_OBJ)

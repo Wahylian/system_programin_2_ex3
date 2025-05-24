@@ -855,10 +855,17 @@ TEST_CASE("Test Player Action Validation"){
     SUBCASE("Test Valid Undo Actions"){
         // since the test player is a base player, it should not have any undo actions
         TestPlayer p = TestPlayer("John");
-        // the undo actions that are avaliable in the game are undoBribe and undoTax
+        
+        // get a vector of the supposed valid undo actions of the player
+        vector<string> validUndoActions = p.getValidUndoActions();
+
+        // check that the vector is empty since the test player is a base player
+        CHECK(validUndoActions.size() == 0);
+
         // check that the player does not accept any undo actions
         CHECK(!p.isValidUndoAction("undoBribe") == true); // judge special action
         CHECK(!p.isValidUndoAction("undoTax") == true); // governor special action
+        CHECK(!p.isValidUndoAction("undoCoup") == true); // general special action
 
         // check that nothing else is accepted as an undo action
         CHECK(!p.isValidUndoAction("undoBanana") == true);  

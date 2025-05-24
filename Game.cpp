@@ -2,7 +2,7 @@
 
 namespace coup{
     Game::Game(const vector<string> &players) :
-        _players{}, _currentPlayer{nullptr} {
+        _players{},_currentPlayer{nullptr} {
         // check if the number of players is valid
         if(players.size() < MIN_PLAYERS || players.size() > MAX_PLAYERS)
             throw invalid_number_of_players_exception(players.size());
@@ -112,7 +112,6 @@ namespace coup{
             currentPlayer->endTurn();
             // advance the game to the next player
             this->nextTurn();
-
             // if the action was to end the turn, return true (-1)
             return -1;
         }
@@ -148,7 +147,6 @@ namespace coup{
 
             // try to coup the target player
             currentPlayer->coup(*target, undone);
-
             // if the coup was successful (meaning no exceptions were thrown)
             // remove the target player from the game
             this->removePlayer(*target);
@@ -167,7 +165,7 @@ namespace coup{
         }
         if(action == "blockArrest"){
             Spy *spy = (Spy *)currentPlayer;
-            spy->blockOtherArrest(*target);
+            spy->blockArrest(*target);
         }
 
         // if the action was not to end the turn, return false (-2)
@@ -294,19 +292,8 @@ namespace coup{
         if(target == nullptr)
             return false;
 
-        // attempt to coup the target player
-        try{
-            // the simulated coup will not actually remove the target player from the game
-            this->_currentPlayer->coup(*target, false); 
-            // return true since the simulated coup was successful
-            return true;
-        }
-        catch(exception &e){
-            // if the coup was not successful, return false
-            // since in the simulated coup the undo flag is set to false there will not be a case 
-            // where the current player needs to be refunded coins and an action
-            return false;
-        }
+        // check if the current player can coup the target player
+        return this->_currentPlayer->canCoup(*target);
     }
 
     void Game::printValidActions() const{

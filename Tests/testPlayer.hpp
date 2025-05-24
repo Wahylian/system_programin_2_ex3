@@ -29,7 +29,6 @@ class TestPlayer : public Player {
 
         ~TestPlayer() {
             // nothing to do here
-            std::cout<< "Test Player " << this->_name << " destroyed" << std::endl;
         }      
     protected:
         // to avoid the class being abstract

@@ -13,6 +13,10 @@ namespace coup{
         if(this == &other)
             throw illegal_action_on_self_exception("Undo Bribe");
 
+        // check if the other player's last action was a bribe
+        if(other.getLastAction() != "bribe")
+            throw undo_wrong_action_exception(other.getName(), "bribe", other.getLastAction());
+
         // removes the additional action from the other player
         other._remainingActions--;
     }

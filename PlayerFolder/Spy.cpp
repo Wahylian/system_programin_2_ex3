@@ -17,7 +17,7 @@ namespace coup{
         return other.coins();
     }
 
-    void Spy::blockOtherArrest(Player &other){
+    void Spy::blockArrest(Player &other){
         // check if the other player is this player
         if(this == &other)
             throw illegal_action_on_self_exception("block the arrest action");

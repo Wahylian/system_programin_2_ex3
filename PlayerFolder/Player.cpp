@@ -3,13 +3,15 @@
 namespace coup{
     Player::Player(const string &name, const string &role): 
         _name{name}, _role{role}, _coins{0}, 
-        _remainingActions{0}, _lastArrested{nullptr}, _blockedActions(BLOCKABLE_ACTIONS, 0){
+        _remainingActions{0}, _lastArrested{nullptr}, _blockedActions(BLOCKABLE_ACTIONS, 0),
+        _lastAction{""} {
         // nothing to do in the actual constructor
     }
 
     Player::Player(const Player &other): 
         _name{other._name}, _role{other._role}, _coins{other._coins}, 
-        _remainingActions{other._remainingActions}, _lastArrested{other._lastArrested}, _blockedActions(other._blockedActions){
+        _remainingActions{other._remainingActions}, _lastArrested{other._lastArrested},
+         _blockedActions(other._blockedActions), _lastAction{other._lastAction} {
         // nothing to do in the copy constructor
     }
 
@@ -48,6 +50,25 @@ namespace coup{
         return this->_remainingActions == 0; 
     }
 
+    bool Player::canCoup(const Player &target) const{
+        int coupCost = 7; // the price of a coup is 7 coins
+
+        // check if the player has an action remaining
+        if(this->isOutOfActions())
+            return false; // the player cannot coup if they don't have an action remaining
+
+        // check if the player has enough coins for this action
+        if(this->coins() < coupCost)
+            return false; // the player cannot coup if they don't have enough coins
+    
+        // check if the player is attempting to coup themselves
+        if(this == &target)
+            return false; // the player cannot coup themselves
+
+        // if the three checks were passed, the player can coup the target
+        return true;
+    }
+
     vector<string> Player::getValidActions() const{
         // creates the vector with the actions available to all players
         vector<string> validActions{"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn"}; 
@@ -56,24 +77,38 @@ namespace coup{
             // adds the invest action to the vector
             validActions.push_back("invest");
         }
-        else if(this->getRole() == "General"){
-            // adds the undoCoup action to the vector
-            validActions.push_back("undoCoup");
-        }
         else if(this->getRole() == "Spy"){
             // adds the spyOn and blockArrest actions to the vector
             validActions.push_back("spyOn");
             validActions.push_back("blockArrest");
         }
-        else if(this->getRole() == "Judge"){
-            // adds the undoBribe action to the vector
-            validActions.push_back("undoBribe");
-        }
-        else if(this->getRole() == "Governor"){
-            // adds the undoTax action to the vector
-            validActions.push_back("undoTax");
-        }
         return validActions;
+    }
+
+    vector<string> Player::getValidUndoActions() const{
+        // create a vector to hold the valid undo actions
+        vector<string> validUndoActions{}; 
+
+        // check the player's role
+        if(this->getRole() == "General"){
+            // add the undoCoup action to the vector
+            validUndoActions.push_back("undoCoup");
+        }
+        if(this->getRole() == "Judge"){
+            // add the undoBribe action to the vector
+            validUndoActions.push_back("undoBribe");
+        }
+        if(this->getRole() == "Governor"){
+            // add the undoTax action to the vector
+            validUndoActions.push_back("undoTax");
+        }
+        // any other player role does not have any undo actions
+        return validUndoActions;
+    }
+
+    const string& Player::getLastAction() const {
+        // returns the last action performed by this player
+        return this->_lastAction; 
     }
 
     void Player::gather(){
@@ -88,6 +123,9 @@ namespace coup{
         this->_coins += 1;
         // decrease the actions left for this player by 1
         this->_remainingActions--;
+
+        // set the last action to gather
+        this->_lastAction = "gather";
     }
 
     void Player::tax(){
@@ -102,6 +140,9 @@ namespace coup{
         this->_coins += 2;
         // decrease the actions left for this player by 1
         this->_remainingActions--;
+
+        // set the last action to tax
+        this->_lastAction = "tax";
     }
 
     void Player::bribe(){
@@ -117,6 +158,9 @@ namespace coup{
 
         // increase the actions left for this player by 1
         this->_remainingActions++;
+
+        // set the last action to bribe
+        this->_lastAction = "bribe"; 
     }
 
     void Player::arrest(Player &other){
@@ -163,6 +207,9 @@ namespace coup{
         this->_lastArrested = &other;
         // decrease the actions left for this player by 1
         this->_remainingActions--;  
+
+        // set the last action to arrest
+        this->_lastAction = "arrest";
     }
 
     void Player::sanction(Player &other){
@@ -198,6 +245,9 @@ namespace coup{
 
         // decrease the actions left for this player by 1
         this->_remainingActions--;
+
+        // set the last action to sanction
+        this->_lastAction = "sanction";
     }
 
     void Player::coup(const Player &other, bool undone){
@@ -219,6 +269,9 @@ namespace coup{
         this->_coins -= coupCost;
         // remove an action from the player
         this->_remainingActions--;
+
+        // set the last action to coup
+        this->_lastAction = "coup";
 
         // after removing the coins and the action, check if the coup was undone
         if(undone)
@@ -271,6 +324,7 @@ namespace coup{
         this->_coins = other._coins;
         this->_remainingActions = other._remainingActions;
         this->_lastArrested = other._lastArrested;
+        this->_lastAction = other._lastAction;
         // copies over the blocked actions
         for(int i = 0; i < BLOCKABLE_ACTIONS; i++){
             this->_blockedActions[i] = other._blockedActions[i];
@@ -289,6 +343,8 @@ namespace coup{
         out << "coins: " << player.coins() << endl;
         // adds the number of actions left for the player
         out << "actions left: " << player.getRemainingActions() << endl;
+        // adds the last action performed by the player
+        out << "last action: " << player.getLastAction() << endl;
         // returns the output stream
         return out;
     }
@@ -315,10 +371,6 @@ namespace coup{
         // the invest action is only available to the baron
         if (action == "invest" && this->getRole() == "Baron")
             return true; 
-        
-        // the undo coup action is only available to the general
-        if (action == "undoCoup" && this->getRole() == "General")
-            return true;
         
         // the spy on action is only available to the spy
         if (action == "spyOn" && this->getRole() == "Spy")
