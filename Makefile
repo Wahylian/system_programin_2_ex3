@@ -6,14 +6,17 @@ CXXFLAGS=-Wall -Werror -std=c++2a
 PLAYER_OBJ = PlayerFolder/Player.o PlayerFolder/Baron.o PlayerFolder/General.o \
 			PlayerFolder/Governor.o PlayerFolder/Judge.o PlayerFolder/Merchant.o PlayerFolder/Spy.o
 
+# object files for the custom exceptions
+CUST_EXCEPT_OBJ = CustomExceptions/CustomPlayerExceptions.o CustomExceptions/CustomGameExceptions.o
+
 # object files used for the game to run
-GAME_OBJ = Game.o CustomExceptions.o $(PLAYER_OBJ)
+GAME_OBJ = Game.o $(CUST_EXCEPT_OBJ) $(PLAYER_OBJ)
 
 # object files for the test files
-TEST_OBJ = Tests/testFile.o Tests/testPlayer.o
+TEST_OBJ = Tests/testFile.o Tests/testPlayer.o Tests/testBaron.o Tests/testGeneral.o
 
 # object files for the main function
-MAIN_OBJ = Main.o $(GAME_OBJ)
+MAIN_OBJ = main.o $(GAME_OBJ)
 
 # valgrind flags, taken from course site, folder 02-classes-constructors-destructors: the makefile in the valgrind folder
 VALGRIND_FLAGS=-v --leak-check=full --show-leak-kinds=all --error-exitcode=99 
@@ -38,6 +41,6 @@ valgrind-test: test
 	valgrind $(VALGRIND_FLAGS) ./test
 
 clean:
-	rm -f *.o PlayerFolder/*.o Tests/*.o Main test
+	rm -f *.o PlayerFolder/*.o CustomExceptions/*.o Tests/*.o Main test
 
 .PHONY: clean 

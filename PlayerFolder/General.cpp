@@ -6,11 +6,11 @@ namespace coup{
 
     General::~General() {
         // nothing to do here
-        std::cout<< "General " << this->name << " destroyed" << std::endl;
     }
 
-    void General::blockCoupAttempt(Player &other){
-        // blocks another player from being coup'd
-        other.blockCoup();
+    void General::undoCoup(Player &other){
+        // undo another player from being coup'd
+
+        // in reality, this function does nothing, as the actual coup action is performed by the game itself
     }
 }

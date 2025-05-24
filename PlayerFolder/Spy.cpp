@@ -6,7 +6,6 @@ namespace coup{
 
     Spy::~Spy() {
         // nothing to do here
-        std::cout<< "Spy " << this->name << " destroyed" << std::endl;
     }
 
     int Spy::spyOn(Player &other){
