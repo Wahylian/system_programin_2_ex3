@@ -38,43 +38,42 @@ namespace coup{
         return this->_remainingActions; 
     }
 
-    const Player& Player::getLastArrested() const {
+    const Player* Player::getLastArrested() const {
         // return the last player arrested by this player
-        return *this->_lastArrested; 
+        return this->_lastArrested; 
     }
 
     bool Player::isOutOfActions() const {
         // check if the player has any more actions left
         return this->_remainingActions == 0; 
-
     }
 
     vector<string> Player::getValidActions() const{
         // creates the vector with the actions available to all players
-        vector<string> isValidActions{"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn"}; 
+        vector<string> validActions{"gather", "tax", "bribe", "arrest", "sanction", "coup", "endTurn"}; 
         // check the player's role
         if(this->getRole() == "Baron"){
             // adds the invest action to the vector
-            isValidActions.push_back("invest");
+            validActions.push_back("invest");
         }
         else if(this->getRole() == "General"){
-            // adds the blockCoup action to the vector
-            isValidActions.push_back("blockCoup");
+            // adds the undoCoup action to the vector
+            validActions.push_back("undoCoup");
         }
         else if(this->getRole() == "Spy"){
             // adds the spyOn and blockArrest actions to the vector
-            isValidActions.push_back("spyOn");
-            isValidActions.push_back("blockArrest");
+            validActions.push_back("spyOn");
+            validActions.push_back("blockArrest");
         }
         else if(this->getRole() == "Judge"){
             // adds the undoBribe action to the vector
-            isValidActions.push_back("undoBribe");
+            validActions.push_back("undoBribe");
         }
         else if(this->getRole() == "Governor"){
             // adds the undoTax action to the vector
-            isValidActions.push_back("undoTax");
+            validActions.push_back("undoTax");
         }
-        return isValidActions;
+        return validActions;
     }
 
     void Player::gather(){
@@ -201,7 +200,7 @@ namespace coup{
         this->_remainingActions--;
     }
 
-    void Player::coup(const Player &other){
+    void Player::coup(const Player &other, bool undone){
         int coupCost = 7; // the price of a coup is 7 coins
 
         // check if the player has an action remaining
@@ -216,14 +215,15 @@ namespace coup{
         if(this == &other)
             throw illegal_action_on_self_exception("coup");
 
-        // check if the other player has a coup block on them
-        if(other.isCoupBlocked())
-            throw blocked_action_exception("coup");
-
         // removes the correct amount of coins from this player
         this->_coins -= coupCost;
         // remove an action from the player
         this->_remainingActions--;
+
+        // after removing the coins and the action, check if the coup was undone
+        if(undone)
+            throw undo_coup_exception(other.getName());
+
     }
 
     void Player::endTurn(){
@@ -241,24 +241,19 @@ namespace coup{
         this->_remainingActions = 1;
     }
 
-    bool Player::isCoupBlocked() const {
-        // returns true if the coup action is blocked, else false
-        return this->_blockedActions[0];
-    }
-
     bool Player::isTaxBlocked() const {
         // returns true if the tax action is blocked, else false
-        return this->_blockedActions[1];
+        return this->_blockedActions[0];
     }
 
     bool Player::isGatherBlocked() const {
         // returns true if the gather action is blocked, else false
-        return this->_blockedActions[2];
+        return this->_blockedActions[1];
     }
 
     bool Player::isArrestBlocked() const {
         // returns true if the arrest action is blocked, else false
-        return this->_blockedActions[3];
+        return this->_blockedActions[2];
     }
 
     Player& Player::operator=(const Player &other){
@@ -266,6 +261,10 @@ namespace coup{
         if(this == &other)
             return *this; // return a reference to this object
         
+        // stops the assignment of a player with a different role to avoid splicing and problems
+        if(this->getRole() != other.getRole())
+            throw illegal_player_assignment_exception(this->_role, other.getRole());
+
         // copies over the values from the other player
         this->_name = other._name;
         this->_role = other._role;
@@ -317,8 +316,8 @@ namespace coup{
         if (action == "invest" && this->getRole() == "Baron")
             return true; 
         
-        // the block coup action is only available to the general
-        if (action == "blockCoup" && this->getRole() == "General")
+        // the undo coup action is only available to the general
+        if (action == "undoCoup" && this->getRole() == "General")
             return true;
         
         // the spy on action is only available to the spy
@@ -339,6 +338,9 @@ namespace coup{
             return true;
             
         if(undoAction == "undoTax" && this->getRole() == "Governor")
+            return true;
+
+        if(undoAction == "undoCoup" && this->getRole() == "General")
             return true;
 
         // returns false if the action is not valid
@@ -366,28 +368,23 @@ namespace coup{
             this->_coins -= amount; // remove coins from the player
     }
 
-    void clearLastArrested(Player &player){
+    void Player::clearLastArrested(){
         // sets the last arrested player to null
-        player._lastArrested = nullptr;
-    }
-
-    void Player::blockCoup(){
-        // sets the coup action as blocked
-        this->_blockedActions[0] = 1;
+        this->_lastArrested = nullptr;
     }
 
     void Player::blockTax(){
         // sets the tax action as blocked
-        this->_blockedActions[1] = 1;
+        this->_blockedActions[0] = 1;
     }
 
     void Player::blockGather(){
         // sets the gather action as blocked
-        this->_blockedActions[2] = 1;
+        this->_blockedActions[1] = 1;
     }
     
     void Player::blockArrest(){
         // sets the arrest action as blocked
-        this->_blockedActions[3] = 1;
+        this->_blockedActions[2] = 1;
     }
 }

@@ -22,10 +22,8 @@ namespace coup{
             int _coins; // the number of coins the player has
             unsigned int _remainingActions; // the number of actions left for the player to perform this turn
             const Player *_lastArrested; // the last player arrested by this player, this player cannot change it
-            const int BLOCKABLE_ACTIONS = 4; // there are 4 actions that can be outright blocked
-            vector<char> _blockedActions; // these are the actions coup, tax, gather and arrest 
-            // block coup is a special case since it is blocking the action from occuring on this player
-            // not the action itself
+            const int BLOCKABLE_ACTIONS = 3; // there are 3 actions that can be outright blocked
+            vector<char> _blockedActions; // these are the actions tax, gather and arrest 
         
         public:
             // constructor 
@@ -51,10 +49,10 @@ namespace coup{
             unsigned int getRemainingActions() const;
 
             // gets the last player arrested by this player
-            const Player& getLastArrested() const;
+            const Player* getLastArrested() const;
 
             // returns a vector of strings with the actions this player can perform
-            // NOTE: includes all possible actions whether they are situational or not
+            // NOTE: this does not include the undo actions
             vector<string> getValidActions() const;
             #pragma endregion
 
@@ -82,7 +80,7 @@ namespace coup{
             // the player chooses another player and eliminates them from the game completely.
             // this action costs 7 coins and can be blocked under specific conditions.
             // throws nothing on success, on failure will throw an excpetion
-            void coup(const Player &other);
+            void coup(const Player &other, bool undone = false);
 
             // the player chooses to end their turn
             // this action removes all actions they may have left as well as lifts any blocks on them
@@ -93,9 +91,6 @@ namespace coup{
             virtual void prepareForTurn();
 
             #pragma region blockCheckers
-            // a check if coup is blocked
-            bool isCoupBlocked() const;
-
             // a check if the tax action is blocked 
             bool isTaxBlocked() const;
 
@@ -129,13 +124,10 @@ namespace coup{
             // remove coins from the player (cannot remove more coins than the player has)
             void removeCoins(int amount);
 
-            // clears the last arrested player
-            friend void clearLastArrested(Player &player);
+            // clears the last arrested player of this player
+            void clearLastArrested();
 
             #pragma region block Actions
-            // blocks the coup action from occuring on this player
-            void blockCoup();
-
             // blocks this player from using the tax action
             void blockTax();
             

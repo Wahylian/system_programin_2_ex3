@@ -4,30 +4,30 @@
 #include <stdexcept>
 
 // an exception that is thrown when an invalid amount of players is attempting to play the game
-class invalid_number_of_players_exception : public std::runtime_error{
+class invalid_number_of_players_exception : public std::invalid_argument{
     public:
         explicit invalid_number_of_players_exception(int playersCount) : 
-        std::runtime_error("There must be between 2 and 6 players in the game, but there are " + std::to_string(playersCount) + " players") 
+        std::invalid_argument("There must be between 2 and 6 players in the game, but there are " + std::to_string(playersCount) + " players") 
         {
             
         }
 };
 
 // an exception that is thrown when a player tries to perform an action that is not valid
-class invalid_action_exception : public std::runtime_error{
+class invalid_action_exception : public std::invalid_argument{
     public:
         explicit invalid_action_exception(const std::string &actionName, const std::string &playerName) : 
-        std::runtime_error("The provided action: " + actionName + " is not a valid action for the player: " + playerName) 
+        std::invalid_argument("The provided action: " + actionName + " is not a valid action for the player: " + playerName) 
         {
             
         }
 };
 
 // an excption that is thrown when a player tries to perform an action on a player that is not in the game
-class player_not_in_game_exception : public std::runtime_error{
+class player_not_in_game_exception : public std::invalid_argument{
     public:
         explicit player_not_in_game_exception(const std::string &playerName) : 
-        std::runtime_error(playerName + " is not a part of the game") 
+        std::invalid_argument(playerName + " is not a part of the game") 
         {
             
         }
@@ -54,10 +54,10 @@ class current_player_not_found_exception : public std::runtime_error{
 };
 
 // an exception that is thrown when attempting to delete the current player
-class deleting_current_player_exception : public std::runtime_error{
+class deleting_current_player_exception : public std::invalid_argument{
     public:
         explicit deleting_current_player_exception(const std::string &playerName) : 
-        std::runtime_error("Cannot delete the current player: " + playerName) 
+        std::invalid_argument("Cannot delete the current player: " + playerName) 
         {
             
         }

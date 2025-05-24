@@ -17,7 +17,7 @@ namespace coup{
             static std::mt19937 gen(rd());
             static std::uniform_int_distribution<> dist(0, 5);
             int randomRole = dist(gen);
-       
+            
             switch(randomRole){
                 case 0:
                     newPlayer = new Spy(playerName);
@@ -48,7 +48,6 @@ namespace coup{
 
         // start the first players turn
         this->_currentPlayer->prepareForTurn();
-
     }
 
     Game::~Game(){
@@ -100,8 +99,7 @@ namespace coup{
         return playerInfo;
     }
 
-    int Game::playAction(const string &action, Player *target){
-
+    int Game::playAction(const string &action, Player *target, bool undone){
         // get the current players turn
         Player *currentPlayer = (this->_players)[currentPlayerIndex()];
         // check if the action is valid for the current player
@@ -114,7 +112,7 @@ namespace coup{
             currentPlayer->endTurn();
             // advance the game to the next player
             this->nextTurn();
-          
+
             // if the action was to end the turn, return true (-1)
             return -1;
         }
@@ -149,7 +147,7 @@ namespace coup{
                 throw player_not_in_game_exception(target->getName());
 
             // try to coup the target player
-            currentPlayer->coup(*target);
+            currentPlayer->coup(*target, undone);
 
             // if the coup was successful (meaning no exceptions were thrown)
             // remove the target player from the game
@@ -163,14 +161,9 @@ namespace coup{
             Baron *baron = (Baron *)currentPlayer;
             baron->invest();
         }
-        if(action == "blockCoup"){
-            General *general = (General *)currentPlayer;
-            general->blockCoup();
-        }
         if(action == "spyOn"){
             Spy *spy = (Spy *)currentPlayer;
             return spy->spyOn(*target);
-
         }
         if(action == "blockArrest"){
             Spy *spy = (Spy *)currentPlayer;
@@ -195,6 +188,10 @@ namespace coup{
         if(undoAction == "undoTax"){
             Governor *governor = (Governor *)&player;
             governor->undoTax(*this->_currentPlayer);
+        }
+        if(undoAction == "undoCoup"){
+            General *general = (General *)&player;
+            general->undoCoup(*this->_currentPlayer);
         }
     }
 
@@ -292,6 +289,26 @@ namespace coup{
         return false;
     }
 
+    bool Game::isValidCoup(const Player *target) const{
+        // if target is null, return false
+        if(target == nullptr)
+            return false;
+
+        // attempt to coup the target player
+        try{
+            // the simulated coup will not actually remove the target player from the game
+            this->_currentPlayer->coup(*target, false); 
+            // return true since the simulated coup was successful
+            return true;
+        }
+        catch(exception &e){
+            // if the coup was not successful, return false
+            // since in the simulated coup the undo flag is set to false there will not be a case 
+            // where the current player needs to be refunded coins and an action
+            return false;
+        }
+    }
+
     void Game::printValidActions() const{
         // prints the actions available to the current player
         cout << "Available actions for " << this->_currentPlayer->getName() << ": " << endl;
@@ -333,6 +350,12 @@ namespace coup{
 
         // remove the player from the game
         for(int i = 0; i < (this->_players).size(); i++){
+            // check if the player's last arrested player is the one to be removed
+            const Player *lastArrested = (this->_players)[i]->getLastArrested();
+            // check if the last arrested player is the one to be removed
+            if(lastArrested == &player)
+                (this->_players[i])->clearLastArrested(); // clears the last arrested player
+
             // check if the player is the one to be removed
             if((this->_players)[i] == &player){
                 // gets a pointer to the player to be removed

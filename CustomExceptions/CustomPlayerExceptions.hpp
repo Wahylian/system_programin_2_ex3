@@ -34,19 +34,38 @@ class not_enough_coins_exception : public std::runtime_error{
 };
 
 // an exception that is thrown when a player tries to arrest the same player twice in a row
-class double_jeopardy_exception : public std::runtime_error{
+class double_jeopardy_exception : public std::invalid_argument{
     public:
         explicit double_jeopardy_exception(const std::string &playerName) :
-        std::runtime_error("cannot arrest " + playerName + " twice in a row") 
+        std::invalid_argument("cannot arrest " + playerName + " twice in a row") 
         {
 
         }
 };
 
-class illegal_action_on_self_exception : public std::runtime_error{
+class illegal_action_on_self_exception : public std::invalid_argument{
     public:
         explicit illegal_action_on_self_exception(const std::string &actionName) :
-        std::runtime_error("cannot perform " + actionName + " on self") 
+        std::invalid_argument("cannot perform " + actionName + " on self") 
+        {
+
+        }
+};
+
+class illegal_player_assignment_exception : public std::invalid_argument{
+    public:
+        explicit illegal_player_assignment_exception(const std::string &className, const std::string &classAssigned) :
+        std::invalid_argument("cannot assign " + classAssigned + " to " + className) 
+        {
+
+        }
+};
+
+class undo_coup_exception : public std::runtime_error{
+    public:
+        explicit undo_coup_exception(const std::string &playerName) :
+        std::runtime_error("the coup on " + playerName + " was undone") 
+
         {
 
         }

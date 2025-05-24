@@ -17,10 +17,10 @@ class TestPlayer : public Player {
         // allows access to the functions through the test class
         using Player::addCoins;
         using Player::removeCoins;
-        using Player::blockCoup;
         using Player::blockTax;
         using Player::blockGather;
         using Player::blockArrest;
+        using Player::clearLastArrested;
 
         TestPlayer(const string &name) : Player(name, "testPlayer")
         { 

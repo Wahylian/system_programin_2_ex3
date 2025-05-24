@@ -50,8 +50,7 @@ namespace coup{
             // return -1 if the action was to end the turn, return -2 if the action was not to end the turn
             // if the action was to spyOn another player, return the number of coins the other player has
             // (since the number of coins is non-negative, it is distinguishable from -1 and -2)
-            int playAction(const string &action, Player *target = nullptr);
-
+            int playAction(const string &action, Player *target = nullptr, bool undone = false);
 
             // lets a player undo an action of the current player
             // note: not all actions are undoable and not all players can undo actions
@@ -85,6 +84,9 @@ namespace coup{
             // will throw an exception if the action is not valid
             bool isTargetRequired(const string &action) const;
 
+            // returns true if the current player is allowed to perform a coup during their turn, else false
+            bool isValidCoup(const Player *target) const; 
+      
         private:
             // gets the index of the current player
             int currentPlayerIndex() const;
